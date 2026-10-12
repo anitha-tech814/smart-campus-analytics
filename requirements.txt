@@ -1,0 +1,12 @@
+# No provider SDK is required: the OpenRouter LLM integration uses the Python
+# standard library (urllib). No new dependencies were added for the assistant.
+fastapi>=0.110.0
+uvicorn==0.34.0
+pydantic>=2.6.0
+sqlalchemy>=2.0.0
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.4.0
+openpyxl>=3.1.0
+python-multipart>=0.0.9
+gunicorn==23.0.0

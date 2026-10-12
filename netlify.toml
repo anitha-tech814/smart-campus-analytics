@@ -1,0 +1,16 @@
+# Netlify Configuration for Smart Campus Analytics
+# Docs: https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  base = "frontend"
+  publish = "dist"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Single-Page Application (SPA) rewrite: Ensures page reloads and direct links work
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -46,10 +46,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Enable CORS for local web interface
+# Enable CORS for web interfaces (local, Netlify, Vercel, and cloud deployments)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_origin_regex=r"https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -70,6 +71,11 @@ def root():
         "documentation": "/docs",
         "privacy": "Local-first: analytics and retrieval run on-premise. Optional assistant answer generation uses OpenRouter and is only enabled when OPENROUTER_API_KEY is configured on the backend."
     }
+
+@app.get("/health")
+@app.get("/api/health")
+def health_check():
+    return {"status": "ok", "app": "Smart Campus Analytics"}
 
 if __name__ == "__main__":
     import uvicorn
