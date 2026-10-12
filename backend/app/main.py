@@ -63,19 +63,48 @@ app.include_router(assistant_router)
 app.include_router(config_router)
 app.include_router(interventions_router)
 
-@app.get("/")
-def root():
-    return {
-        "app": "Smart Campus Analytics",
-        "status": "Online",
-        "documentation": "/docs",
-        "privacy": "Local-first: analytics and retrieval run on-premise. Optional assistant answer generation uses OpenRouter and is only enabled when OPENROUTER_API_KEY is configured on the backend."
-    }
+import os
+from fastapi import HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 @app.get("/health")
 @app.get("/api/health")
 def health_check():
     return {"status": "ok", "app": "Smart Campus Analytics"}
+
+# Serve pre-built frontend distribution if present (full-stack single URL deployment)
+FRONTEND_DIST = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist"))
+if os.path.isdir(FRONTEND_DIST):
+    assets_path = os.path.join(FRONTEND_DIST, "assets")
+    if os.path.isdir(assets_path):
+        app.mount("/assets", StaticFiles(directory=assets_path), name="assets")
+
+    @app.get("/")
+    def serve_root():
+        index_file = os.path.join(FRONTEND_DIST, "index.html")
+        if os.path.isfile(index_file):
+            return FileResponse(index_file)
+        return {"status": "Online", "app": "Smart Campus Analytics"}
+
+    @app.get("/{full_path:path}")
+    def serve_frontend_spa(full_path: str):
+        # Never swallow API routes or OpenAPI endpoints
+        if full_path.startswith("api/") or full_path == "api" or full_path.startswith("docs") or full_path == "openapi.json":
+            raise HTTPException(status_code=404, detail="API route not found")
+        candidate = os.path.join(FRONTEND_DIST, full_path)
+        if full_path and os.path.isfile(candidate):
+            return FileResponse(candidate)
+        return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
+else:
+    @app.get("/")
+    def root():
+        return {
+            "app": "Smart Campus Analytics",
+            "status": "Online",
+            "documentation": "/docs",
+            "privacy": "Local-first: analytics and retrieval run on-premise."
+        }
 
 if __name__ == "__main__":
     import uvicorn
