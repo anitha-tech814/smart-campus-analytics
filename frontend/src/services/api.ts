@@ -10,7 +10,10 @@ import {
   AssistantIndexStatus
 } from '../types';
 
-const API_BASE = '/api';
+const customBase = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '').trim();
+const API_BASE = customBase
+  ? (customBase.endsWith('/api') ? customBase : `${customBase.replace(/\/+$/, '')}/api`)
+  : '/api';
 
 export async function fetchOverview(): Promise<DashboardOverview> {
   const res = await fetch(`${API_BASE}/analytics/overview`);
