@@ -1,0 +1,21 @@
+# Secrets / local environment (never commit real credentials)
+.env
+backend/.env
+*.env
+!*.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Local data & generated artifacts
+backend/campus_analytics.db
+backend/rag_store/
+backend/backups/
+*.log
+
+# Node / build output
+node_modules/
+frontend/dist/
