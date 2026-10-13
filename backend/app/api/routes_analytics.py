@@ -393,7 +393,7 @@ def get_recommendation_playbooks(db: Session = Depends(get_db)):
             enriched,
             key=lambda x: (x.get("last_reviewed_at") is None, x["id"])
         )
-    ]
+    ][:100]
 
     return {
         "total_students": len(enriched),

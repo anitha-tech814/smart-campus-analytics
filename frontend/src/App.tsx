@@ -245,7 +245,7 @@ export const App: React.FC = () => {
 
   // Initial Load
   useEffect(() => {
-    Promise.all([loadOverview(), loadStudents(), loadClusters(), loadRiskRoster(), loadRecommendations()]).finally(() => {
+    Promise.all([loadOverview(), loadStudents(), loadClusters()]).finally(() => {
       setInitialLoading(false);
     });
   }, []);
@@ -257,10 +257,14 @@ export const App: React.FC = () => {
     }
   }, [search, department, riskLevel, placementStatus, sortBy, sortDesc, page]);
 
-  // Load report when tab changes to report
+  // Lazy-load heavier dataset views only when requested
   useEffect(() => {
-    if (currentTab === 'report') {
+    if (currentTab === 'report' && !reportData) {
       loadReport();
+    } else if (currentTab === 'risk' && !riskRoster) {
+      loadRiskRoster();
+    } else if (currentTab === 'recommendations' && !recAggregate) {
+      loadRecommendations();
     }
   }, [currentTab]);
 
@@ -278,7 +282,13 @@ export const App: React.FC = () => {
     setInitialLoading(true);
     setLoadError(null);
     setLoadErrorDetail(null);
-    Promise.all([loadOverview(), loadStudents(), loadClusters(), loadRiskRoster(), loadRecommendations()]).finally(() => {
+    Promise.all([
+      loadOverview(),
+      loadStudents(),
+      loadClusters(),
+      ...(currentTab === 'risk' ? [loadRiskRoster()] : []),
+      ...(currentTab === 'recommendations' ? [loadRecommendations()] : [])
+    ]).finally(() => {
       setInitialLoading(false);
     });
   };

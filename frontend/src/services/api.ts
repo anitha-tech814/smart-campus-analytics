@@ -15,9 +15,11 @@ const API_BASE = customBase
   ? (customBase.endsWith('/api') ? customBase : `${customBase.replace(/\/+$/, '')}/api`)
   : '/api';
 
+const statusMsg = (res: Response) => res.statusText ? `HTTP ${res.status} (${res.statusText})` : `HTTP ${res.status}`;
+
 export async function fetchOverview(): Promise<DashboardOverview> {
   const res = await fetch(`${API_BASE}/analytics/overview`);
-  if (!res.ok) throw new Error(`Failed to load overview: ${res.statusText}`);
+  if (!res.ok) throw new Error(`Failed to load overview: ${statusMsg(res)}`);
   return res.json();
 }
 

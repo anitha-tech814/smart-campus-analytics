@@ -68,3 +68,17 @@ class Intervention(Base):
     outcome_summary = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    salt = Column(String, nullable=False)
+    full_name = Column(String, nullable=False)
+    role = Column(String, nullable=False, default="advisor")  # 'advisor', 'faculty', 'admin'
+    department = Column(String, nullable=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+

@@ -9,6 +9,8 @@ from app.api.routes_analytics import router as analytics_router
 from app.api.routes_assistant import router as assistant_router
 from app.api.routes_config import router as config_router
 from app.api.routes_interventions import router as interventions_router
+from app.api.routes_auth import router as auth_router
+from app.services.auth_service import ensure_demo_users
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,11 +19,16 @@ async def lifespan(app: FastAPI):
     # Additively migrate the schema for optional future-compatible dimensions
     ensure_schema()
     
-    # Auto-seed initial demo dataset if database is empty
+    # Auto-seed initial demo dataset and demo accounts if database is empty
     db = SessionLocal()
     try:
         count = seed_database_with_demo_data(db, force=False)
-        print(f"[Smart Campus Analytics] Initialized database with {count} student records.")
+        ensure_demo_users(db)
+        print(f"[Smart Campus Analytics] Initialized database with {count} student records and verified auth accounts.")
+        # Pre-warm the full-cohort enrichment cache so the first HTTP request responds instantly
+        from app.api.routes_students import get_all_enriched
+        get_all_enriched(db)
+        print("[Smart Campus Analytics] Enriched student cache warmed up.")
     finally:
         db.close()
 
@@ -62,6 +69,7 @@ app.include_router(analytics_router)
 app.include_router(assistant_router)
 app.include_router(config_router)
 app.include_router(interventions_router)
+app.include_router(auth_router)
 
 import os
 from fastapi import HTTPException

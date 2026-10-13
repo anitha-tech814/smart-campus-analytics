@@ -659,3 +659,28 @@ export interface AtRiskRegisterData {
   };
 }
 
+export interface UserProfile {
+  id: number;
+  email: string;
+  full_name: string;
+  role: 'advisor' | 'faculty' | 'admin';
+  department?: string | null;
+  created_at?: string | null;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  user: UserProfile;
+  provider: string;
+}
+
+export interface DemoAccountInfo {
+  role: string;
+  label: string;
+  email: string;
+  password: string;
+  description: string;
+}
+
+

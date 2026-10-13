@@ -84,7 +84,27 @@ class RiskThresholds(BaseModel):
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATABASE_PATH = os.path.join(BASE_DIR, "campus_analytics.db")
 
+# Supabase PostgreSQL and Auth configuration:
+# When SUPABASE_DATABASE_URL or DATABASE_URL is set, SQLAlchemy uses PostgreSQL.
+# Otherwise, it falls back seamlessly to the local SQLite database.
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip()
+SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "").strip()
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+
+raw_db_url = (os.environ.get("SUPABASE_DATABASE_URL") or os.environ.get("DATABASE_URL") or "").strip()
+if raw_db_url:
+    if raw_db_url.startswith("postgres://"):
+        raw_db_url = raw_db_url.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = raw_db_url
+    IS_POSTGRES = True
+else:
+    DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+    IS_POSTGRES = False
+
+AUTH_SECRET_KEY = os.environ.get("AUTH_SECRET_KEY") or os.environ.get("JWT_SECRET") or "smart-campus-analytics-auth-secret-key-2026"
+
 # Number of synthetic demonstration student records seeded on first run / reset.
-DEMO_RECORD_COUNT = 12000
+# Safe default of 2400 students keeps memory well under Render free tier's 512MB RAM limit.
+DEMO_RECORD_COUNT = int(os.environ.get("DEMO_RECORD_COUNT", "2400"))
 DEFAULT_WEIGHTS = ScoringWeights()
 DEFAULT_THRESHOLDS = RiskThresholds()

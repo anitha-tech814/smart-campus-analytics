@@ -258,3 +258,42 @@ class AssistantAnswer(BaseModel):
     degraded: bool = False
     notes: List[str] = []
 
+
+# --- Authentication & Role-Based Access Control ---------------------------
+class UserRegisterRequest(BaseModel):
+    email: str
+    password: str
+    full_name: str
+    role: Optional[str] = "advisor"  # 'advisor' | 'faculty' | 'admin'
+    department: Optional[str] = None
+
+
+class UserLoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+    full_name: str
+    role: str
+    department: Optional[str] = None
+    created_at: Optional[str] = None
+
+
+class AuthResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse
+    provider: str = "local"  # 'local' or 'supabase'
+
+
+class DemoAccountInfo(BaseModel):
+    role: str
+    label: str
+    email: str
+    password: str
+    description: str
+
+

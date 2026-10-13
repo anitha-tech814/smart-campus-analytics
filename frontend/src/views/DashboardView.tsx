@@ -77,9 +77,15 @@ export const DashboardView: React.FC<Props> = ({
           </p>
         )}
         <p className="text-xs text-slate-500">
-          Verify the backend API server is running at{' '}
-          <code className="font-mono bg-slate-100 px-1 rounded">http://127.0.0.1:8000</code> (launch{' '}
-          <code className="font-mono bg-slate-100 px-1 rounded">start_backend.bat</code>), then retry.
+          {typeof window !== 'undefined' && !['localhost', '127.0.0.1'].includes(window.location.hostname) ? (
+            <>The backend service may be waking up from sleep or warming up its cache. Click <strong className="text-slate-700">Retry Connection</strong> below to reconnect.</>
+          ) : (
+            <>
+              Verify the backend API server is running at{' '}
+              <code className="font-mono bg-slate-100 px-1 rounded">http://127.0.0.1:8000</code> (launch{' '}
+              <code className="font-mono bg-slate-100 px-1 rounded">start_backend.bat</code>), then retry.
+            </>
+          )}
         </p>
         {onRetry && (
           <button
